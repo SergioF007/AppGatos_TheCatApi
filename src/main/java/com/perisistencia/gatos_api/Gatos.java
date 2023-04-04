@@ -10,16 +10,16 @@ package com.perisistencia.gatos_api;
  */
 public class Gatos {
     
-    int id;
+    String id;
     String url;
     String apikey = "live_XIN3L3cOcvKXlUfBbCs0rnIAlAPat08GZ5f1T1rlQcY3st90JyHc2h12QdiqQZQC";
     String imagen; 
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
