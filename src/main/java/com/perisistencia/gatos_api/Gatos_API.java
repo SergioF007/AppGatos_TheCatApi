@@ -16,7 +16,7 @@ public class Gatos_API {
     public static void main(String[] args) throws IOException {
         
         int opcion_menu = -1; 
-        String[] botones = {"1. Ver gatos", "2. Salir"}; 
+        String[] botones = {"1. Ver gatos", "2. Ver Favoirtos", "3. Salir"}; 
         
         do {           
             
@@ -37,6 +37,10 @@ public class Gatos_API {
                 case 0: 
                     GatosService.verGatos(); 
                     continue;
+                case 1:
+                    Gatos gato = new Gatos(); 
+                    GatosService.verFavorito(gato.getApikey()); 
+                    break;
                     
                 default:
                     break;
