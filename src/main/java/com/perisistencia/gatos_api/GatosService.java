@@ -52,7 +52,9 @@ public class GatosService {
         
         // Redimencinar Imagen 
         
-        Image image = null;
+        Image image = null; 
+        
+        int opcion_menu = -1;
         
         try {
             URL url = new URL(gatos.getUrl());
@@ -70,15 +72,54 @@ public class GatosService {
                 Image modificada = fondo.getScaledInstance(800, 500, java.awt.Image.SCALE_SMOOTH); 
                 fondoGato = new ImageIcon(modificada);
             }
+            
+            String menu = "Opciones: \n "
+                    + "1. Ver otra imagen  \n "
+                    + "2. Favorito \n"
+                    + "3. Volver \n";
+            
+            String[] botones = {"Ver otra imagen", "Favorito", "Volver"};
 
             String id_gato = gatos.getId();
-            String opcion = (String) JOptionPane.showInputDialog(null, null, id_gato, JOptionPane.INFORMATION_MESSAGE, fondoGato,null, null);
+            String opcion = (String) JOptionPane.showInputDialog(null, menu, id_gato, JOptionPane.INFORMATION_MESSAGE, fondoGato,botones, botones[0]);
+               
+            for (int i = 0; i < botones.length; i++) {
+                
+                if (opcion.equals(botones[i])) {
+                    
+                    opcion_menu = i; 
+                    
+                }
+                
+            }
             
+            switch (opcion_menu) {
+                case 0:
+                    verGatos();
+                    
+                    break; 
+                    
+                case 1:
+                    favoritoGato(gatos); 
+                    break;
+                   
+                case 2:
+                    
+                   break;
+                   
+                default:
+                    break;
+            }
             
         } catch (IOException e) {
             
             System.out.println(e);
         }
+    }
+    
+    public static void favoritoGato(Gatos gatos) {
+        
+        
     }
     
 }
