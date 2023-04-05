@@ -137,15 +137,14 @@ public class GatosService {
         }
     }
     
-    public static void verFavorito(String apiKey) throws IOException {
+    public static void verFavorito(GatosFav gatosFav) throws IOException {
         
         OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, "");
+
         Request request = new Request.Builder()
           .url("https://api.thecatapi.com/v1/favourites")
-          .method("GET", body)
-          .addHeader("x-api-key", apiKey)
+          .get()
+          .addHeader("x-api-key", gatosFav.getApikey())
           .build();
         Response response = client.newCall(request).execute();
         
@@ -161,14 +160,78 @@ public class GatosService {
             
             int min = 1;
             int max = gatosArray.length;
-            int aleatorio = (int) (Math.random() * ((max-min)-1)) + min; 
+            int aleatorio = (int) (Math.random() * ((max-min)+1)) + min; 
             int indice = aleatorio-1; 
             
             GatosFav gatoFav = gatosArray[indice]; 
             
-            
-        }
-        
+            Image image = null; 
+
+            int opcion_menu = -1;
+
+            try {
+                URL url = new URL(gatoFav.image.getUrl());
+                //Creo una conexión HTTP con el servidor que aloja la imagen del perro
+                HttpURLConnection http = (HttpURLConnection) url.openConnection();
+                // Agrega una propiedad de solicitud al objeto http
+                http.addRequestProperty("User-Agent", "");
+                BufferedImage bufferedImage = ImageIO.read(http.getInputStream());
+                ImageIcon fondoGato = new ImageIcon(bufferedImage); 
+
+                if (fondoGato.getIconWidth() > 800 || fondoGato.getIconHeight() > 500) {
+
+                    // redimencionar
+                    Image fondo = fondoGato.getImage();
+                    Image modificada = fondo.getScaledInstance(800, 500, java.awt.Image.SCALE_SMOOTH); 
+                    fondoGato = new ImageIcon(modificada);
+                }
+
+                String menu = "Opciones: \n "
+                        + "1. Ver otra imagen  \n "
+                        + "2. Eliminar Favorito \n"
+                        + "3. Volver \n";
+
+                String[] botones = {"Ver otro favorito", "Eliminar Favorito", "Volver"};
+
+                String id_gato = gatoFav.getId();
+                String opcion = (String) JOptionPane.showInputDialog(null, menu, id_gato, JOptionPane.INFORMATION_MESSAGE, fondoGato,botones, botones[0]);
+
+                for (int i = 0; i < botones.length; i++) {
+
+                    if (opcion.equals(botones[i])) {
+
+                        opcion_menu = i; 
+
+                    }
+
+                }
+
+                switch (opcion_menu) {
+                    case 0:
+                        verFavorito(gatoFav);
+                        break; 
+
+                    case 1:
+                        borrarFavorito(gatoFav); 
+                        break;
+
+                    case 2:
+
+                       break;
+
+                    default:
+                        break;
+                }
+
+            } catch (IOException e) {
+
+                System.out.println(e);
+            }                 
+        } 
+    }
+    
+    public static void borrarFavorito(GatosFav gatoFav) {
+
         
     }
     

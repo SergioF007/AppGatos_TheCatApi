@@ -38,8 +38,8 @@ public class Gatos_API {
                     GatosService.verGatos(); 
                     continue;
                 case 1:
-                    Gatos gato = new Gatos(); 
-                    GatosService.verFavorito(gato.getApikey()); 
+                    GatosFav gato = new GatosFav(); 
+                    GatosService.verFavorito(gato); 
                     break;
                     
                 default:
