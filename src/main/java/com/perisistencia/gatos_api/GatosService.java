@@ -215,10 +215,6 @@ public class GatosService {
                         borrarFavorito(gatoFav); 
                         break;
 
-                    case 2:
-
-                       break;
-
                     default:
                         break;
                 }
@@ -230,9 +226,29 @@ public class GatosService {
         } 
     }
     
-    public static void borrarFavorito(GatosFav gatoFav) {
-
+    public static void borrarFavorito(GatosFav gatoFav) throws IOException {
         
+        try {
+            OkHttpClient client = new OkHttpClient();
+            MediaType mediaType = MediaType.parse("text/plain");
+            RequestBody body = RequestBody.create(mediaType, "");
+            Request request = new Request.Builder()
+              .url("https://api.thecatapi.com/v1/favourites/"+gatoFav.getId())
+              .method("DELETE", body)
+              .addHeader("x-api-key", "live_XIN3L3cOcvKXlUfBbCs0rnIAlAPat08GZ5f1T1rlQcY3st90JyHc2h12QdiqQZQC")
+              .build();
+            Response response = client.newCall(request).execute();
+            if(response.code() == 200) {
+                    JOptionPane.showMessageDialog(null, "Gato Favorito " + gatoFav.getId() + " Eliminado ");
+            }else {
+                    JOptionPane.showMessageDialog(null, "Algo a fallado " + response.code());
+            }
+
+            
+        } catch (IOException e) {
+            
+            System.out.println(e);
+        }
     }
     
 }
