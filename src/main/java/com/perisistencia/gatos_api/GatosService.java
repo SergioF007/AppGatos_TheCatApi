@@ -10,14 +10,21 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  *
@@ -52,7 +59,6 @@ public class GatosService {
         
         // Redimencinar Imagen 
         
-        Image image = null; 
         
         int opcion_menu = -1;
         
@@ -137,101 +143,83 @@ public class GatosService {
         }
     }
     
-    public static void verFavorito(GatosFav gatosFav) throws IOException {
+public static void verFavoritos(GatosFav gatosFav) throws IOException {
         
-        OkHttpClient client = new OkHttpClient();
+    OkHttpClient client = new OkHttpClient();
 
-        Request request = new Request.Builder()
-          .url("https://api.thecatapi.com/v1/favourites")
-          .get()
-          .addHeader("x-api-key", gatosFav.getApikey())
-          .build();
-        Response response = client.newCall(request).execute();
-        
-        String elJson = response.body().string(); 
-        
-        Gson gson = new Gson();
-        
-        GatosFav[] gatosArray = gson.fromJson(elJson, GatosFav[].class); 
-        
-        // Vamos a seleccionar una de los favoritos aleatoriamente
-        
-        if (gatosArray.length > 0 ) {
+    Request request = new Request.Builder()
+        .url("https://api.thecatapi.com/v1/favourites")
+        .get()
+        .addHeader("x-api-key", gatosFav.getApikey())
+        .build();
+    Response response = client.newCall(request).execute();
+    
+    String elJson = response.body().string(); 
+    
+    Gson gson = new Gson();
+    
+    GatosFav[] gatosArray = gson.fromJson(elJson, GatosFav[].class); 
+    
+    // ArrayList<ImageIcon> listFav = new ArrayList<>(); 
+    
+    // crear un panel para mostrar las imágenes
+    JPanel panel = new JPanel(new GridLayout(0, 1));
+    panel.setPreferredSize(new Dimension(800, 800));
             
-            int min = 1;
-            int max = gatosArray.length;
-            int aleatorio = (int) (Math.random() * ((max-min)+1)) + min; 
-            int indice = aleatorio-1; 
+    for (GatosFav gatoFav : gatosArray) {
+        Image image = null; 
+
+        try {
+            URL url = new URL(gatoFav.image.getUrl());
+            //Creo una conexión HTTP con el servidor que aloja la imagen del perro
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            // Agrega una propiedad de solicitud al objeto http
+            http.addRequestProperty("User-Agent", "");
+            BufferedImage bufferedImage = ImageIO.read(http.getInputStream());
+            ImageIcon fondoGato = new ImageIcon(bufferedImage); 
+
+            if (fondoGato.getIconWidth() > 500 || fondoGato.getIconHeight() > 500) {
+
+                // redimensionar
+                Image fondo = fondoGato.getImage();
+                Image modificada = fondo.getScaledInstance(200, 200, java.awt.Image.SCALE_SMOOTH); 
+                fondoGato = new ImageIcon(modificada);
+            }
             
-            GatosFav gatoFav = gatosArray[indice]; 
+            // listFav.add(fondoGato); 
             
-            Image image = null; 
+            // Agregar una etiqueta con la imagen al panel
+            JLabel label = new JLabel(fondoGato);
+            panel.add(label);
 
-            int opcion_menu = -1;
 
-            try {
-                URL url = new URL(gatoFav.image.getUrl());
-                //Creo una conexión HTTP con el servidor que aloja la imagen del perro
-                HttpURLConnection http = (HttpURLConnection) url.openConnection();
-                // Agrega una propiedad de solicitud al objeto http
-                http.addRequestProperty("User-Agent", "");
-                BufferedImage bufferedImage = ImageIO.read(http.getInputStream());
-                ImageIcon fondoGato = new ImageIcon(bufferedImage); 
-
-                if (fondoGato.getIconWidth() > 800 || fondoGato.getIconHeight() > 500) {
-
-                    // redimencionar
-                    Image fondo = fondoGato.getImage();
-                    Image modificada = fondo.getScaledInstance(800, 500, java.awt.Image.SCALE_SMOOTH); 
-                    fondoGato = new ImageIcon(modificada);
-                }
-
-                String menu = "Opciones: \n "
-                        + "1. Ver otra imagen  \n "
-                        + "2. Eliminar Favorito \n"
-                        + "3. Volver \n";
-
-                String[] botones = {"Ver otro favorito", "Eliminar Favorito", "Volver"};
-
-                String id_gato = gatoFav.getId();
-                String opcion = (String) JOptionPane.showInputDialog(null, menu, id_gato, JOptionPane.INFORMATION_MESSAGE, fondoGato,botones, botones[0]);
-
-                for (int i = 0; i < botones.length; i++) {
-
-                    if (opcion.equals(botones[i])) {
-
-                        opcion_menu = i; 
-
-                    }
-
-                }
-
-                switch (opcion_menu) {
-                    case 0:
-                        verFavorito(gatoFav);
-                        break; 
-
-                    case 1:
-                        borrarFavorito(gatoFav); 
-                        break;
-
-                    case 2:
-
-                       break;
-
-                    default:
-                        break;
-                }
-
-            } catch (IOException e) {
-
-                System.out.println(e);
-            }                 
-        } 
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
+    
+
+    // agregar un JLabel para cada imagen almacenada en la lista
+ /*   for (ImageIcon imagen : listFav) {
+        JLabel label = new JLabel(imagen);
+        panel.add(label);
+    } */
+
+    // agregar el panel a un JScrollPane para que sea posible desplazarse por las imágenes si hay muchas
+    // JScrollPane scrollPane = new JScrollPane(panel);
+    // scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    // scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    
+
+    // mostrar el JScrollPane en un JOptionPane.showInputDialog
+    JOptionPane.showInputDialog(null, scrollPane, "Gatos favoritos", JOptionPane.PLAIN_MESSAGE);
+
+}
     
     public static void borrarFavorito(GatosFav gatoFav) {
 
+        
         
     }
     

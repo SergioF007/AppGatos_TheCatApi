@@ -39,7 +39,7 @@ public class Gatos_API {
                     continue;
                 case 1:
                     GatosFav gato = new GatosFav(); 
-                    GatosService.verFavorito(gato); 
+                    GatosService.verFavoritos(gato); 
                     break;
                     
                 default:
