@@ -10,6 +10,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -21,6 +22,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -71,11 +75,11 @@ public class GatosService {
             BufferedImage bufferedImage = ImageIO.read(http.getInputStream());
             ImageIcon fondoGato = new ImageIcon(bufferedImage); 
             
-            if (fondoGato.getIconWidth() > 800 || fondoGato.getIconHeight() > 500) {
+            if (fondoGato.getIconWidth() > 400 || fondoGato.getIconHeight() > 400) {
                 
                 // redimencionar
                 Image fondo = fondoGato.getImage();
-                Image modificada = fondo.getScaledInstance(800, 500, java.awt.Image.SCALE_SMOOTH); 
+                Image modificada = fondo.getScaledInstance(400, 400, java.awt.Image.SCALE_SMOOTH); 
                 fondoGato = new ImageIcon(modificada);
             }
             
@@ -163,8 +167,8 @@ public static void verFavoritos(GatosFav gatosFav) throws IOException {
     // ArrayList<ImageIcon> listFav = new ArrayList<>(); 
     
     // crear un panel para mostrar las imágenes
-    JPanel panel = new JPanel(new GridLayout(0, 1));
-    panel.setPreferredSize(new Dimension(800, 800));
+    JPanel panel = new JPanel(new GridLayout(0, 4));
+    panel.setPreferredSize(new Dimension(1000, 800));
             
     for (GatosFav gatoFav : gatosArray) {
         Image image = null; 
@@ -178,7 +182,7 @@ public static void verFavoritos(GatosFav gatosFav) throws IOException {
             BufferedImage bufferedImage = ImageIO.read(http.getInputStream());
             ImageIcon fondoGato = new ImageIcon(bufferedImage); 
 
-            if (fondoGato.getIconWidth() > 500 || fondoGato.getIconHeight() > 500) {
+            if (fondoGato.getIconWidth() > 400 || fondoGato.getIconHeight() > 400) {
 
                 // redimensionar
                 Image fondo = fondoGato.getImage();
@@ -188,9 +192,20 @@ public static void verFavoritos(GatosFav gatosFav) throws IOException {
             
             // listFav.add(fondoGato); 
             
-            // Agregar una etiqueta con la imagen al panel
-            JLabel label = new JLabel(fondoGato);
-            panel.add(label);
+            //  Crea un nuevo JPanel para cada imagen
+            JPanel panelImg = new JPanel(new BorderLayout()); 
+            // Agrego el Id de la imagen al panel  y Agrego la Imagen
+            JLabel imgId = new JLabel("ID: " + gatoFav.getId(), JLabel.CENTER); 
+            JLabel img = new JLabel(fondoGato, JLabel.CENTER);
+            
+            // Los agrego al panel
+            panelImg.add(imgId, BorderLayout.NORTH); 
+            panelImg.add(img, BorderLayout.CENTER); 
+            
+            panelImg.setPreferredSize(new Dimension(100, 50));
+
+            
+            panel.add(panelImg);
 
 
         } catch (IOException e) {
@@ -200,7 +215,8 @@ public static void verFavoritos(GatosFav gatosFav) throws IOException {
     
 
     // agregar un JLabel para cada imagen almacenada en la lista
- /*   for (ImageIcon imagen : listFav) {
+ /* 
+    for (ImageIcon imagen : listFav) {
         JLabel label = new JLabel(imagen);
         panel.add(label);
     } */
@@ -209,11 +225,35 @@ public static void verFavoritos(GatosFav gatosFav) throws IOException {
     // JScrollPane scrollPane = new JScrollPane(panel);
     // scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
     // scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-    JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     
+    //JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    
+    // crear un panel a la derecha con el Select text label y el botón OK
+    JPanel panelDerecho = new JPanel(new GridLayout(3, 1));
+    JComboBox<String> opciones = new JComboBox<>(new String[]{"Eliminar Favorito", "Volver"});
+    JButton botonOK = new JButton("OK");
+    panelDerecho.add(new JLabel("Seleccionar opción:"));
+    panelDerecho.add(opciones);
+    panelDerecho.add(botonOK);
+    
+    JPanel panelTotal = new  JPanel(); 
+    panelTotal.add(panel, BorderLayout.CENTER);
+    panelTotal.add(panelDerecho, BorderLayout.EAST); 
+    
+    JScrollPane scrollPane = new JScrollPane(panelTotal, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
     // mostrar el JScrollPane en un JOptionPane.showInputDialog
-    JOptionPane.showInputDialog(null, scrollPane, "Gatos favoritos", JOptionPane.PLAIN_MESSAGE);
+    //JOptionPane.showInputDialog(null, scrollPane, "Gatos favoritos", JOptionPane.PLAIN_MESSAGE);
+    
+    // crear un JFrame para mostrar el JScrollPane en una ventana
+    JFrame frame = new JFrame("Gatos favoritos");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //frame.add(panel, BorderLayout.CENTER);
+    //frame.add(panelDerecho, BorderLayout.EAST);
+    frame.add(scrollPane); 
+    frame.pack();
+    frame.setVisible(true);
+    
 
 }
     
